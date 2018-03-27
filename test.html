@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <p>
+    <label>input1</label>
+    <input type="text" id="input1">
+  </p>
+  <p>
+    <label>input2</label>
+    <input type="text" id="input2">
+  </p>
+<script>
+  function binding (keys) {
+    this.key = keys
+    this.value = null
+    let obj = new Object()
+    Object.defineProperty(obj, this.key, {
+      configurable: true,
+      get () {
+        this.value
+      },
+      set (val) {
+        this.value = val
+      }
+    })
+  }
+
+  let bind = new binding('val')
+
+  let ipt = document.getElementsByTagName('input')
+  for(let i of ipt){
+    i.addEventListener('input', function () {
+      bind.val = this.value
+      ipt[0].value = bind.val
+      ipt[1].value = bind.val
+    })
+  }
+</script>
+</body>
+</html>
