@@ -23,7 +23,7 @@
     Object.defineProperty(obj, this.key, {
       configurable: true,
       get () {
-        this.value
+        return this.value
       },
       set (val) {
         this.value = val
