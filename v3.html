@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      function objectValue(obj) {
+        const map = {
+          function: true,
+          object: true
+        };
+        return !!map[typeof obj];
+      }
+      class Dep {
+        constructor() {
+          this.dep = [];
+        }
+        add(fn) {
+          this.dep.push(fn);
+        }
+        run() {
+          let cb;
+          while ((cb = this.dep.shift())) {
+            cb();
+          }
+        }
+      }
+      function Observer(obj, fn) {
+        const dep = new Dep();
+        return new Proxy(obj, {
+          get(target, key, value) {
+            // 如果有当前属性，可能访问的是二级属性
+            if (Reflect.has(target, key) && objectValue(target[key])) {
+              return new Observer(target[key], fn);
+            }
+            dep.add(fn);
+            return Reflect.get(target, key, value);
+          },
+          set(target, key, value, context) {
+            // 对proxy进行访问，触发一次get函数
+            const val = context[key];
+            if (val !== value) {
+              Reflect.set(target, key, value, context);
+              dep.run();
+            }
+            return true;
+          }
+        });
+      }
+      const watchObj = new Observer({}, function() {
+        console.log('change');
+      });
+      watchObj.a = {};
+      watchObj.b = '456';
+      watchObj.a.v = '456';
+      watchObj.a.v = '789';
+      console.log(watchObj);
+    </script>
+  </body>
+</html>
